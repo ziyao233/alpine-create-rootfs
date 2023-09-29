@@ -5,6 +5,7 @@
 #	A script creates bootable (with openRC) rootfs
 
 ARCH=$(uname -m)
+DIRECT_MIRROR=
 ROOT=
 MINI_ROOTFS=
 RELEASE=
@@ -19,6 +20,8 @@ usage() {
 	echo '	--mirror:	Specify apk mirror'
 	echo '	--rootfs:	Specify Alpine minimal rootfs'
 	echo '	--release:	Speicfy Alpine Linux release (e.g., 3.18)'
+	echo '	--proxy:	Set up HTTP(s) proxy'
+	echo '	--direct-mirror:Connect to the mirror directly'
 	echo '	--help:		Print this usage'
 }
 
@@ -59,6 +62,9 @@ do
 		export http_proxy=$2
 		export https_proxy=$2
 		shift
+		;;
+	--direct-mirror)
+		DIRECT_MIRROR=yes
 		;;
 	*)
 		if ! [ x$ROOT = x ]
@@ -101,6 +107,15 @@ fi
 echo Decompressing minimal rootfs
 tar xzf $MINI_ROOTFS -C $ROOT
 
+# Unset proxy-related environment variables if we want to connect to the mirror
+# directly.
+
+if ! [ x$DIRECT_MIRROR = x ]
+then
+	unset http_proxy
+	unset https_proxy
+fi
+
 # Recreate /etc/apk/repositories
 echo "Setting up mirror (/etc/apk/repositories)"
 cat <<EOF >$ROOT/etc/apk/repositories
@@ -121,7 +136,7 @@ add_services() {
 	while ! [ x$1 = x ]
 	do
 		echo Enable $1 in runlevel $target
-		ln -s $ROOT/etc/init.d/$1 $ROOT/etc/runlevels/$target/
+		ln -s /etc/init.d/$1 $ROOT/etc/runlevels/$target/
 		shift
 	done
 }

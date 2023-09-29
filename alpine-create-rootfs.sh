@@ -16,13 +16,13 @@ usage() {
 	echo 'usage:'
 	echo 'alpine-create-rootfs [OPTIONS] <ROOT>'
 	echo 'OPTIONS:'
-	echo '	--arch:		Specify architecture'
-	echo '	--mirror:	Specify apk mirror'
-	echo '	--rootfs:	Specify Alpine minimal rootfs'
-	echo '	--release:	Speicfy Alpine Linux release (e.g., 3.18)'
-	echo '	--proxy:	Set up HTTP(s) proxy'
-	echo '	--direct-mirror:Connect to the mirror directly'
-	echo '	--help:		Print this usage'
+	echo '	--arch		Specify architecture'
+	echo '	--mirror	Specify apk mirror'
+	echo '	--rootfs	Specify Alpine minimal rootfs'
+	echo '	--release	Speicfy Alpine Linux release (e.g., 3.18)'
+	echo '	--proxy		Set up HTTP(s) proxy'
+	echo '	--direct-mirror	Connect to the mirror directly'
+	echo '	--help		Print this usage'
 }
 
 summary() {
@@ -66,6 +66,10 @@ do
 	--direct-mirror)
 		DIRECT_MIRROR=yes
 		;;
+	--help)
+		usage
+		exit 1
+		;;
 	*)
 		if ! [ x$ROOT = x ]
 		then
@@ -81,12 +85,14 @@ done
 if [ x$ROOT = x ]
 then
 	echo Please specify the path to root
+	usage
 	exit 1
 fi
 
 if [ x$RELEASE = x ]
 then
 	echo Please specify Alpine Linux release
+	usage
 	exit 1
 fi
 
